@@ -133,6 +133,7 @@ const findContactPoints = require('./scrapeGoogleLinks.js').findContactPoints;
             for (var i = 0; i < batch.length; i++) {
                 const restaurant = batch[i];
                 const urls = await findContactPoints(restaurant, browser);
+                console.log(restaurant, urls);
                 if (urls.length > 0) {
                     contactPoints.push({
                         name: restaurant,
