@@ -1,9 +1,10 @@
 const puppeteer = require('puppeteer');
+const findContactPoints = require('./scrapeGoogleLinks.js').findContactPoints;
 (async () => {
-    const searchLocation = "Souderton PA";
-    const search = "Restaurant";
+    const searchLocation = "Dresher PA";
+    const search = "home services";
 
-    const MAX = 900;
+    const MAX = 1000;
     const START = 0;
     let current = 0;
 
@@ -110,14 +111,40 @@ const puppeteer = require('puppeteer');
 
 
     }
-    function done() {
-        browser.close();
-        console.log("-----------------DONE-----------------");
+    async function done() {
+        const noSites = [];
         Object.keys(results).forEach((restaurant) => {
             if (!results[restaurant]) {
                 console.log(`${restaurant}:           https://google.com/search?q=${encodeURIComponent(restaurant)} `);
+                noSites.push(restaurant);
             }
-        })
+        });
+
+        const batchSize = 10;
+        //Split noSites into batches of batchSize
+        const batches = [];
+        for (let i = 0; i < noSites.length; i += batchSize) {
+            batches.push(noSites.slice(i, i + batchSize));
+        }
+
+        //Iterate over batches with a delay of 10 seconds. For each item in batch, find contact points and add to an array if they exist
+        const contactPoints = [];
+        for (batch of batches) {
+            for (var i = 0; i < batch.length; i++) {
+                const restaurant = batch[i];
+                const urls = await findContactPoints(restaurant, browser);
+                if (urls.length > 0) {
+                    contactPoints.push({
+                        name: restaurant,
+                        urls: urls
+                    });
+                }
+            }
+            await new Promise(resolve => setTimeout(resolve, 10 * 1000));
+        }
+        console.log(contactPoints);
+
+        browser.close();
     }
     scrapeCurrentURLs();
 })();
