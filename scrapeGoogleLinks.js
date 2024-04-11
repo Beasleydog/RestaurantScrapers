@@ -1,7 +1,7 @@
 async function scrapeGoogleLinks(query, browser) {
     const page = await browser.newPage();
     await page.goto(`https://www.google.com/search?q=${query}`);
-    await page.waitForSelector(`[data-async-context="query:${encodeURIComponent(query)}"]`, {
+    await page.waitForSelector(`#search`, {
         timeout: 0
     });
     const urls = await page.evaluate(() => {
