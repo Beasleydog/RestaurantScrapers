@@ -435,7 +435,7 @@ const findContactPoints = require('./scrapeGoogleLinks.js').findContactPoints;
             newPage.setViewport({ width: 1536, height: 730 });
 
             console.log("go to")
-            newPage.goto(`https://www.google.com/maps/search/${name}/@40.1926361,-75.1390561,17z?entry=ttu`, {
+            await newPage.goto(`https://www.google.com/maps/search/${name}/@40.1926361,-75.1390561,17z?entry=ttu`, {
                 timeout: 0
             });
             // console.log("main wati");
