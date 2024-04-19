@@ -37,6 +37,7 @@ function isInstagramProfile(url) {
     return b;
 }
 
+
 module.exports = {
     scrapeGoogleLinks,
     findContactPoints

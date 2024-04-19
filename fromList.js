@@ -1,14 +1,8 @@
 const puppeteer = require('puppeteer');
 const findContactPoints = require('./scrapeGoogleLinks.js').findContactPoints;
 (async () => {
-    const searchLocation = "Feasterville PA";
-    const search = "restaurant";
-
-    const MAX = 1000;
-    const START = 0;
     let current = 0;
 
-    const startUrl = `https://www.yelp.com/search?find_desc=${search}&find_loc=${searchLocation}&start=${START}`;
     const results = {};
 
     //Set protocolTimeout to infinite
@@ -830,6 +824,13 @@ const findContactPoints = require('./scrapeGoogleLinks.js').findContactPoints;
             "Blue Fig Cafe"
         ]
 
+        //Remove any duplicates
+        names = Array.from(new Set(names));
+
+        //Remove any characters that aren't letters, numbers, spaces, or punctuation
+        names = names.map(name => name.replace(/[^a-zA-Z0-9\s.,;'"!?]/g, ''));
+
+
         let count = 0;
 
         await Promise.all(names.map(async (name) => {
@@ -928,24 +929,27 @@ const findContactPoints = require('./scrapeGoogleLinks.js').findContactPoints;
             batches.push(noSites.slice(i, i + batchSize));
         }
 
+        console.log("----------DONE-------------");
         //Iterate over batches with a delay of 10 seconds. For each item in batch, find contact points and add to an array if they exist
         const contactPoints = [];
         for (batch of batches) {
             for (var i = 0; i < batch.length; i++) {
                 const restaurant = batch[i];
                 const urls = await findContactPoints(restaurant, browser);
-                console.log(restaurant, urls);
                 if (urls.length > 0) {
                     contactPoints.push({
                         name: restaurant,
                         urls: urls
                     });
+                    console.log(restaurant);
+                    urls.forEach((url) => {
+                        console.log(url);
+                    });
+                    console.log("----------");
                 }
             }
             await new Promise(resolve => setTimeout(resolve, 10 * 1000));
         }
-        console.log(contactPoints);
-
         browser.close();
     }
     scrapeCurrentURLs();
