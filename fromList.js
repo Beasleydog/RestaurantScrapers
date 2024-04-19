@@ -24,6 +24,7 @@ const findContactPoints = require('./scrapeGoogleLinks.js').findContactPoints;
         let names = [
             "El Limon",
             "Chalfont Family Restaurant",
+            "Rob's Loft 52",
             "New Britain Inn",
             "Los Sarapes Chalfont",
             "Owowcow Creamery",
@@ -88,7 +89,6 @@ const findContactPoints = require('./scrapeGoogleLinks.js').findContactPoints;
             "Hops/Scotch",
             "Chambers 19",
             "Pag���s Wine Bar",
-            "Rob's Loft 52",
             "Geronimo Brewing",
             "Planet Smoothie",
             "Zad Albasha Mediterranean Grill & H...",
@@ -422,7 +422,7 @@ const findContactPoints = require('./scrapeGoogleLinks.js').findContactPoints;
             await new Promise((res) => {
                 setTimeout(() => {
                     let check = setInterval(() => {
-                        if (count < 10) {
+                        if (count < 1) {
                             res();
                             clearInterval(check);
                         }
@@ -439,9 +439,27 @@ const findContactPoints = require('./scrapeGoogleLinks.js').findContactPoints;
                 timeout: 0
             });
             // console.log("main wati");
-            await newPage.waitForSelector("[role=main]", {
-                timeout: 0
+            const found = await newPage.evaluate(() => {
+                const check = setInterval(() => {
+                    if (document.querySelector("[role=main]")) {
+                        clearInterval(check);
+                        return true;
+                    }
+                }, 1000);
+
+                setTimeout(() => {
+                    clearInterval(check);
+                    return false;
+                }, 1000 * 10);
             });
+
+            if (!found) {
+                results[name] = false;
+                count--;
+                await newPage.close();
+
+                return;
+            }
             console.log("YEA");
             console.log(name);
             const redirect = await newPage.evaluate(() => {
