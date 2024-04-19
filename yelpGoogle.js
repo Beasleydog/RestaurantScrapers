@@ -1,8 +1,8 @@
 const puppeteer = require('puppeteer');
 const findContactPoints = require('./scrapeGoogleLinks.js').findContactPoints;
 (async () => {
-    const searchLocation = "Dresher PA";
-    const search = "home services";
+    const searchLocation = "Feasterville PA";
+    const search = "restaurant";
 
     const MAX = 1000;
     const START = 0;

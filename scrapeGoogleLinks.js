@@ -27,13 +27,13 @@ async function findContactPoints(query, browser) {
 function isFacebookProfile(url) {
     let b = true;
     if (!url.includes("facebook.com")) b = false;
-    if (url.split("").filter(x => x === "/").length != 4) b = false;
+    // if (url.split("").filter(x => x === "/").length != 4) b = false;
     return b;
 }
 function isInstagramProfile(url) {
     let b = true;
     if (!url.includes("instagram.com")) b = false;
-    if (url.split("").filter(x => x === "/").length != 4) b = false;
+    // if (url.split("").filter(x => x === "/").length != 4) b = false;
     return b;
 }
 
