@@ -21,7 +21,7 @@ const findContactPoints = require('./scrapeGoogleLinks.js').findContactPoints;
 
 
     async function scrapeCurrentURLs() {
-        let names = [
+        let namesOg = [
             "El Limon",
             "Chalfont Family Restaurant",
             "Rob's Loft 52",
@@ -408,7 +408,12 @@ const findContactPoints = require('./scrapeGoogleLinks.js').findContactPoints;
         ]
 
         //Remove any duplicates
-        names = Array.from(new Set(names));
+        let names = [];
+        namesOg.forEach((name) => {
+            if (!names.includes(name)) {
+                names.push(name);
+            }
+        });
 
         //Remove any characters that aren't letters, numbers, spaces, or punctuation
         names = names.map(name => name.replace(/[^a-zA-Z0-9\s.,;'"!?]/g, ''));
@@ -416,18 +421,18 @@ const findContactPoints = require('./scrapeGoogleLinks.js').findContactPoints;
 
         let count = 0;
 
-        await Promise.all(names.map(async (name) => {
+        await Promise.all(names.map(async (name, i) => {
             //make new page for each url
 
             await new Promise((res) => {
                 setTimeout(() => {
                     let check = setInterval(() => {
-                        if (count < 1) {
+                        if (count < 20) {
                             res();
                             clearInterval(check);
                         }
                     }, 1000);
-                }, Math.random() * 1000);
+                }, i / names.length * 1000);
             })
             count++;
 
@@ -439,21 +444,13 @@ const findContactPoints = require('./scrapeGoogleLinks.js').findContactPoints;
                 timeout: 0
             });
             // console.log("main wati");
-            const found = await newPage.evaluate(() => {
-                const check = setInterval(() => {
-                    if (document.querySelector("[role=main]")) {
-                        clearInterval(check);
-                        return true;
-                    }
-                }, 1000);
+            await newPage.waitForSelector("[role=main]");
 
-                setTimeout(() => {
-                    clearInterval(check);
-                    return false;
-                }, 1000 * 10);
+            const notFound = await newPage.evaluate(() => {
+                return !![...document.getElementsByTagName("span")].find(x => x.innerText === "Make sure your search is spelled correctly.");
             });
 
-            if (!found) {
+            if (notFound) {
                 results[name] = false;
                 count--;
                 await newPage.close();
